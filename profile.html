@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 速买商城</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="container">
+        <span>速买商城 - 综合性网上购物平台</span>
+        <div>
+            <a href="index.html">首页</a>
+            <a href="cart.html">购物车<span class="cart-count">0</span></a>
+            <a href="#" onclick="doLogout()">退出登录</a>
+        </div>
+    </div>
+</div>
+
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">速买<span>【李钧涛 24215220129】</span></a>
+        <div style="font-size:18px;color:var(--text);font-weight:600;">个人中心</div>
+    </div>
+</header>
+
+<div class="profile-page">
+    <!-- Profile Header -->
+    <div class="profile-header" id="profileHeader">
+        <div class="profile-avatar">👤</div>
+        <div class="profile-info">
+            <h2 id="profileName">未登录</h2>
+            <p>学号：24215220129 | 姓名：李钧涛</p>
+            <p id="profileRegTime">注册时间：-</p>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="profile-tabs">
+        <div class="p-tab active" onclick="switchProfileTab('orders', this)">📦 我的订单</div>
+        <div class="p-tab" onclick="switchProfileTab('info', this)">👤 个人信息</div>
+        <div class="p-tab" onclick="switchProfileTab('settings', this)">⚙️ 账号设置</div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-content" id="profileContent"></div>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+let currentUser = getCurrentUser();
+
+function initProfile() {
+    if (!currentUser) {
+        document.getElementById('profileContent').innerHTML = `
+            <div style="text-align:center;padding:70px 0;">
+                <p style="font-size:56px;margin-bottom:20px;">🔒</p>
+                <p style="color:var(--text-secondary);font-size:16px;font-weight:500;">请先登录查看个人中心</p>
+                <a href="login.html" class="btn btn-primary" style="display:inline-block;width:auto;margin-top:24px;padding:12px 36px;">去登录</a>
+            </div>
+        `;
+        return;
+    }
+    document.getElementById('profileName').textContent = currentUser.username;
+    if (currentUser.createdAt) {
+        document.getElementById('profileRegTime').textContent = '注册时间：' + new Date(currentUser.createdAt).toLocaleString('zh-CN');
+    }
+    renderOrders();
+}
+
+function switchProfileTab(tab, el) {
+    document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+
+    if (tab === 'orders') renderOrders();
+    else if (tab === 'info') renderInfo();
+    else if (tab === 'settings') renderSettings();
+}
+
+function renderOrders() {
+    const orders = getOrders().filter(o => o.username === currentUser.username);
+    const container = document.getElementById('profileContent');
+
+    if (orders.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center;padding:70px 0;">
+                <p style="font-size:50px;">📋</p>
+                <p style="color:var(--text-secondary);font-weight:500;">还没有订单</p>
+                <a href="index.html" class="btn btn-outline" style="display:inline-block;width:auto;margin-top:18px;">去购物</a>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+    orders.forEach(order => {
+        const items = order.items.map(i => `<img src="${i.img || ''}" alt="" style="width:24px;height:24px;object-fit:cover;border-radius:4px;vertical-align:middle;" onerror="this.style.display='none'"> ${i.emoji} ${i.name} ×${i.quantity}`).join('、');
+        const statusColors = {
+            '待发货': '#f39c12',
+            '已完成': '#27ae60',
+            '已取消': '#999'
+        };
+        const statusColor = statusColors[order.status] || 'var(--primary)';
+        html += `
+            <div class="order-card">
+                <div class="order-header">
+                    <span>📋 订单号：${order.id}</span>
+                    <span>📅 ${order.date}</span>
+                    <span style="color:${statusColor};font-weight:600;">${order.status}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:15px;">
+                    <span style="font-size:13px;flex:1;">${items}</span>
+                    <div style="font-weight:700;color:var(--primary);font-size:18px;">${formatPrice(order.total)}</div>
+                </div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:10px;">
+                    👤 收货人：${order.receiver} | 📞 ${order.phone} | 📍 ${order.address}
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function renderInfo() {
+    document.getElementById('profileContent').innerHTML = `
+        <div style="max-width:500px;">
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" value="${currentUser.username}" readonly style="background:var(--bg-secondary);">
+            </div>
+            <div class="form-group">
+                <label>学号</label>
+                <input type="text" value="24215220129" readonly style="background:var(--bg-secondary);">
+            </div>
+            <div class="form-group">
+                <label>姓名</label>
+                <input type="text" value="李钧涛" readonly style="background:var(--bg-secondary);">
+            </div>
+            <div class="form-group">
+                <label>注册时间</label>
+                <input type="text" value="${new Date(currentUser.createdAt).toLocaleString('zh-CN')}" readonly style="background:var(--bg-secondary);">
+            </div>
+        </div>
+    `;
+}
+
+function renderSettings() {
+    document.getElementById('profileContent').innerHTML = `
+        <div style="max-width:500px;">
+            <div class="form-group">
+                <label>修改密码</label>
+                <input type="password" id="newPassword" placeholder="输入新密码（至少6位）">
+            </div>
+            <div class="form-group">
+                <label>确认新密码</label>
+                <input type="password" id="confirmPassword" placeholder="再次输入新密码">
+            </div>
+            <button class="btn btn-primary" style="width:auto;padding:12px 36px;" onclick="changePassword()">保存修改</button>
+        </div>
+    `;
+}
+
+function changePassword() {
+    const newPass = document.getElementById('newPassword').value;
+    const confirmPass = document.getElementById('confirmPassword').value;
+    if (!newPass || newPass.length < 6) {
+        showToast('密码长度不能少于6位');
+        return;
+    }
+    if (newPass !== confirmPass) {
+        showToast('两次输入的密码不一致');
+        return;
+    }
+    const users = getUsers();
+    const user = users.find(u => u.username === currentUser.username);
+    if (user) {
+        user.password = newPass;
+        localStorage.setItem('users', JSON.stringify(users));
+        showToast('密码修改成功');
+    }
+}
+
+function doLogout() {
+    logoutUser();
+    showToast('已退出登录');
+    setTimeout(() => { location.href = 'index.html'; }, 500);
+}
+
+initProfile();
+</script>
+</body>
+</html>

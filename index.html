@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>速买商城 - 综合性网上购物平台【李钧涛 24215220129】</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="container">
+        <span class="welcome" id="welcome-text">欢迎来到速买商城！</span>
+        <div id="auth-links">
+            <a href="login.html">登录</a>
+            <a href="login.html#register">注册</a>
+            <a href="profile.html">我的订单</a>
+        </div>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">速买<span>【李钧涛 24215220129】</span></a>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="搜索商品、品牌、分类...">
+            <button onclick="doSearch()">搜索</button>
+        </div>
+        <div class="header-icons">
+            <a href="profile.html">
+                <span class="icon">👤</span>个人中心
+            </a>
+            <a href="cart.html" style="position:relative;">
+                <span class="icon">🛒</span>购物车
+                <span class="cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Navigation -->
+<nav class="nav">
+    <div class="container">
+        <div class="all-categories">
+            ☰ 全部分类
+            <div class="category-dropdown" id="categoryDropdown"></div>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="active">首页</a>
+            <a href="#" onclick="filterByCategory('手机数码')">手机数码</a>
+            <a href="#" onclick="filterByCategory('电脑办公')">电脑办公</a>
+            <a href="#" onclick="filterByCategory('家用电器')">家用电器</a>
+            <a href="#" onclick="filterByCategory('美妆护肤')">美妆护肤</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Banner Carousel -->
+<div class="banner">
+    <div class="carousel" id="carouselContainer">
+        <div class="carousel-slides" id="carouselSlides">
+            <div class="carousel-slide" style="background: url('images/w16.jpg') center/cover no-repeat;">
+                <div class="slide-content" style="background: rgba(0,0,0,0.45); padding: 35px 50px; border-radius: 16px; backdrop-filter: blur(4px);">
+                    <h2>华为 Mate 70 Pro 震撼上市</h2>
+                    <p>搭载麒麟9100芯片 · 卫星通信 · 限时优惠中</p>
+                </div>
+            </div>
+            <div class="carousel-slide" style="background: url('images/w17.jpg') center/cover no-repeat;">
+                <div class="slide-content" style="background: rgba(0,0,0,0.45); padding: 35px 50px; border-radius: 16px; backdrop-filter: blur(4px);">
+                    <h2>MacBook Pro M4 新品首发</h2>
+                    <p>性能新高度 · 学生专属优惠 · 分期免息</p>
+                </div>
+            </div>
+            <div class="carousel-slide" style="background: url('images/w18.jpg') center/cover no-repeat;">
+                <div class="slide-content" style="background: rgba(0,0,0,0.45); padding: 35px 50px; border-radius: 16px; backdrop-filter: blur(4px);">
+                    <h2>索尼降噪耳机 618狂欢价</h2>
+                    <p>年度最低价 · 限时抢购 · 到手仅需2499</p>
+                </div>
+            </div>
+            <div class="carousel-slide" style="background: linear-gradient(135deg, #ff6b6b, #e3393c);">
+                <div class="slide-content">
+                    <div style="font-size:80px; margin-bottom: 10px;">🛒</div>
+                    <h2>速买618 · 年中大促</h2>
+                    <p>全场低至5折 · 满299减50 · 更多惊喜等你来</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-btn prev" onclick="prevSlide()">❮</button>
+        <button class="carousel-btn next" onclick="nextSlide()">❯</button>
+        <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container" id="mainContent">
+    <!-- Category Tags -->
+    <div class="section-title">商品分类</div>
+    <div class="category-tags" id="categoryTags"></div>
+
+    <!-- Featured Products -->
+    <div class="section-title">热门推荐</div>
+    <div class="product-grid" id="productGrid"></div>
+</div>
+
+<!-- Search Results Modal -->
+<div class="modal-overlay" id="searchModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>搜索结果</h3>
+            <button class="modal-close" onclick="closeSearch()">&times;</button>
+        </div>
+        <div class="product-grid" id="searchResults" style="grid-template-columns:repeat(3,1fr);"></div>
+    </div>
+</div>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="回到顶部">↑</button>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <h4>购物指南</h4>
+            <a href="#">购物流程</a>
+            <a href="#">会员介绍</a>
+            <a href="#">常见问题</a>
+            <a href="#">联系客服</a>
+        </div>
+        <div>
+            <h4>配送方式</h4>
+            <a href="#">上门自提</a>
+            <a href="#">快递运输</a>
+            <a href="#">物流跟踪</a>
+            <a href="#">配送范围</a>
+        </div>
+        <div>
+            <h4>支付方式</h4>
+            <a href="#">货到付款</a>
+            <a href="#">在线支付</a>
+            <a href="#">分期付款</a>
+            <a href="#">银行卡支付</a>
+        </div>
+        <div>
+            <h4>售后服务</h4>
+            <a href="#">退换货政策</a>
+            <a href="#">退款说明</a>
+            <a href="#">联系卖家</a>
+            <a href="#">投诉建议</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2025 速买商城 Subuy.com 版权所有 | 李钧涛 24215220129 | 广东东软学院 Web编程技术 大作业</p>
+    </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+// Carousel
+let currentSlide = 0;
+const totalSlides = 4;
+let carouselInterval;
+
+function renderCarousel() {
+    const dotsContainer = document.getElementById('carouselDots');
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'dot' + (i === currentSlide ? ' active' : '');
+        dot.onclick = () => goToSlide(i);
+        dotsContainer.appendChild(dot);
+    }
+}
+
+function goToSlide(index) {
+    currentSlide = index;
+    document.getElementById('carouselSlides').style.transform = `translateX(-${currentSlide * 100}%)`;
+    renderCarousel();
+    resetAutoSlide();
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    goToSlide(currentSlide);
+}
+
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    goToSlide(currentSlide);
+}
+
+function startAutoSlide() {
+    carouselInterval = setInterval(nextSlide, 4000);
+}
+
+function resetAutoSlide() {
+    clearInterval(carouselInterval);
+    startAutoSlide();
+}
+
+// Pause on hover
+document.addEventListener('DOMContentLoaded', () => {
+    const carousel = document.getElementById('carouselContainer');
+    if (carousel) {
+        carousel.addEventListener('mouseenter', () => clearInterval(carouselInterval));
+        carousel.addEventListener('mouseleave', startAutoSlide);
+    }
+});
+
+// Render category dropdown and tags
+function renderCategories() {
+    const dropdown = document.getElementById('categoryDropdown');
+    const tags = document.getElementById('categoryTags');
+    if (dropdown) {
+        dropdown.innerHTML = categories.map(c =>
+            `<a href="#" onclick="filterByCategory('${c}')">${c}</a>`
+        ).join('');
+    }
+    if (tags) {
+        tags.innerHTML = categories.map((c, i) =>
+            `<span class="category-tag${i === 0 ? ' active' : ''}" onclick="filterByCategory('${c}')" data-cat="${c}">${c}</span>`
+        ).join('');
+    }
+}
+
+// Current category filter
+let currentCategory = '全部';
+
+function filterByCategory(cat) {
+    currentCategory = cat;
+    document.querySelectorAll('.category-tag').forEach(tag => {
+        tag.classList.toggle('active', tag.dataset.cat === cat);
+    });
+    renderProducts();
+}
+
+// Render products
+function renderProducts(filteredProducts = null) {
+    const grid = document.getElementById('productGrid');
+    let items = filteredProducts || products;
+    if (currentCategory !== '全部') {
+        items = items.filter(p => p.category === currentCategory);
+    }
+    if (!grid) return;
+    grid.innerHTML = items.map(p => `
+        <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
+            <div class="product-img">
+                <img src="${p.img}" alt="${p.name}" onerror="this.style.display='none'">
+                <span class="placeholder" style="font-size:70px;">${p.emoji}</span>
+                ${p.sold > 20000 ? '<span class="product-badge">热卖</span>' : ''}
+            </div>
+            <div class="product-info">
+                <div class="product-name">${p.name}</div>
+                <div class="product-price">
+                    ${formatPrice(p.price)}
+                    <span class="original">${formatPrice(p.originalPrice)}</span>
+                </div>
+                <div class="product-sold">已售 ${p.sold.toLocaleString()} 件</div>
+            </div>
+            <button class="quick-add" onclick="event.stopPropagation();quickAddToCart(${p.id})" title="快速加入购物车">+</button>
+        </div>
+    `).join('');
+}
+
+function quickAddToCart(id) {
+    addToCart(id, 1);
+}
+
+// Search
+function doSearch() {
+    const keyword = document.getElementById('searchInput').value.trim();
+    if (!keyword) {
+        showToast('请输入搜索关键词');
+        return;
+    }
+    const results = searchProducts(keyword);
+    const modal = document.getElementById('searchModal');
+    const resultsContainer = document.getElementById('searchResults');
+    if (results.length === 0) {
+        resultsContainer.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-muted);font-size:15px;">未找到相关商品，换个关键词试试吧~</p>';
+    } else {
+        resultsContainer.innerHTML = results.map(p => `
+            <div class="product-card" onclick="location.href='product.html?id=${p.id}';closeSearch();">
+                <div class="product-img">
+                    <img src="${p.img}" alt="${p.name}" onerror="this.style.display='none'">
+                    <span class="placeholder" style="font-size:70px;">${p.emoji}</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-price">${formatPrice(p.price)}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+    modal.classList.add('active');
+}
+
+function closeSearch() {
+    document.getElementById('searchModal').classList.remove('active');
+}
+
+// Back to top
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.addEventListener('scroll', () => {
+    const btn = document.getElementById('backToTop');
+    if (btn) {
+        btn.classList.toggle('visible', window.scrollY > 500);
+    }
+});
+
+// Enter key search
+document.addEventListener('DOMContentLoaded', () => {
+    renderCarousel();
+    startAutoSlide();
+    renderCategories();
+    renderProducts();
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') doSearch();
+        });
+    }
+    updateCartCount();
+});
+</script>
+</body>
+</html>

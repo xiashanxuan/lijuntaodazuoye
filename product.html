@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品详情 - 速买商城</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="container">
+        <span>速买商城 - 综合性网上购物平台</span>
+        <div>
+            <a href="index.html">首页</a>
+            <a href="cart.html">购物车<span class="cart-count">0</span></a>
+            <a href="profile.html">个人中心</a>
+        </div>
+    </div>
+</div>
+
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">速买<span>【李钧涛 24215220129】</span></a>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="搜索商品、品牌、分类...">
+            <button onclick="doSearch()">搜索</button>
+        </div>
+        <div class="header-icons">
+            <a href="cart.html" style="position:relative;">
+                <span class="icon">🛒</span>购物车
+                <span class="cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="breadcrumb">
+        <a href="index.html">首页</a> <span>›</span>
+        <a href="index.html" id="breadcrumbCat">分类</a> <span>›</span>
+        <span id="breadcrumbName" style="color:var(--text);">商品名称</span>
+    </div>
+</div>
+
+<div class="product-detail" id="productDetail">
+    <div class="product-gallery">
+        <img src="" alt="" id="productImg" onerror="this.style.display='none'">
+        <span class="placeholder" id="productPlaceholder" style="font-size:150px;">📱</span>
+    </div>
+    <div class="product-info-detail">
+        <h1 id="productName">商品名称</h1>
+        <div class="price-box">
+            <span class="current-price" id="productPrice">¥0</span>
+            <span class="original-price" id="productOriginalPrice">¥0</span>
+            <span style="background:var(--primary-gradient);color:#fff;padding:3px 10px;border-radius:3px;font-size:12px;margin-left:12px;font-weight:600;">优惠价</span>
+        </div>
+        <div class="meta">
+            <p id="productDesc">商品描述</p>
+            <p>📂 分类：<span id="productCat">-</span></p>
+            <p>📊 已售：<span id="productSold">0</span> 件</p>
+            <p>📍 发货地：广东 · 佛山</p>
+            <p>🚚 快递：免运费</p>
+            <p style="margin-top:10px;color:var(--text-muted);font-size:12px;">学号姓名：李钧涛 24215220129</p>
+        </div>
+        <div class="quantity-selector">
+            <span>数量：</span>
+            <button onclick="changeQty(-1)">-</button>
+            <input type="number" id="qtyInput" value="1" min="1" max="99" onchange="validateQty()">
+            <button onclick="changeQty(1)">+</button>
+            <span style="color:var(--text-muted);font-size:12px;margin-left:14px;">库存 999 件</span>
+        </div>
+        <div>
+            <button class="btn-add-cart" onclick="addToCartHandler()">🛒 加入购物车</button>
+            <button class="btn-buy-now" onclick="buyNow()">⚡ 立即购买</button>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="margin-top:30px;background:#fff;border-radius:14px;padding:30px;box-shadow:var(--shadow);border:1px solid var(--border-light);">
+    <div class="section-title">商品评价（98%好评）</div>
+    <div style="padding:20px 0;">
+        <div style="display:flex;align-items:center;gap:15px;margin-bottom:18px;padding:14px;background:var(--bg-secondary);border-radius:10px;">
+            <span style="font-size:36px;">💬</span>
+            <div>
+                <p style="font-weight:600;">匿名用户 <span style="color:#f39c12;">⭐⭐⭐⭐⭐</span></p>
+                <p style="color:var(--text-secondary);font-size:14px;margin-top:3px;">非常好用，物流很快，包装也很精美，推荐购买！</p>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:15px;padding:14px;background:var(--bg-secondary);border-radius:10px;">
+            <span style="font-size:36px;">💬</span>
+            <div>
+                <p style="font-weight:600;">匿名用户 <span style="color:#f39c12;">⭐⭐⭐⭐⭐</span></p>
+                <p style="color:var(--text-secondary);font-size:14px;margin-top:3px;">品质很好，和描述完全一致，满意的购物体验。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="回到顶部">↑</button>
+
+<script src="js/main.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const productId = parseInt(params.get('id')) || 1;
+let product = getProduct(productId);
+if (!product) product = products[0];
+
+let quantity = 1;
+
+function renderProduct() {
+    document.getElementById('productPlaceholder').textContent = product.emoji;
+    document.getElementById('productImg').src = product.img;
+    document.getElementById('productImg').alt = product.name;
+    document.getElementById('productName').textContent = product.name + ' [李钧涛 24215220129]';
+    document.getElementById('productPrice').textContent = formatPrice(product.price);
+    document.getElementById('productOriginalPrice').textContent = formatPrice(product.originalPrice);
+    document.getElementById('productDesc').textContent = product.desc;
+    document.getElementById('productCat').textContent = product.category;
+    document.getElementById('productSold').textContent = product.sold.toLocaleString();
+    document.getElementById('breadcrumbCat').textContent = product.category;
+    document.getElementById('breadcrumbCat').href = 'index.html?cat=' + encodeURIComponent(product.category);
+    document.getElementById('breadcrumbName').textContent = product.name;
+    document.title = product.name + ' - 速买商城';
+}
+
+function changeQty(delta) {
+    quantity = Math.max(1, Math.min(99, quantity + delta));
+    document.getElementById('qtyInput').value = quantity;
+}
+
+function validateQty() {
+    let val = parseInt(document.getElementById('qtyInput').value);
+    if (isNaN(val) || val < 1) val = 1;
+    if (val > 99) val = 99;
+    quantity = val;
+    document.getElementById('qtyInput').value = quantity;
+}
+
+function addToCartHandler() {
+    addToCart(product.id, quantity);
+}
+
+function buyNow() {
+    addToCart(product.id, quantity);
+    location.href = 'checkout.html';
+}
+
+function doSearch() {
+    const keyword = document.getElementById('searchInput').value.trim();
+    if (keyword) {
+        location.href = 'index.html?search=' + encodeURIComponent(keyword);
+    }
+}
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.addEventListener('scroll', () => {
+    const btn = document.getElementById('backToTop');
+    if (btn) btn.classList.toggle('visible', window.scrollY > 500);
+});
+
+document.getElementById('searchInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') doSearch();
+});
+
+renderProduct();
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提交订单 - 速买商城</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="container">
+        <span>速买商城 - 综合性网上购物平台</span>
+        <div>
+            <a href="index.html">首页</a>
+            <a href="cart.html">返回购物车</a>
+        </div>
+    </div>
+</div>
+
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">速买<span>【李钧涛 24215220129】</span></a>
+        <div style="font-size:18px;color:var(--text);font-weight:600;">确认订单</div>
+    </div>
+</header>
+
+<div class="checkout-page">
+    <div class="checkout-grid">
+        <!-- Left: Order Form -->
+        <div>
+            <div class="checkout-section">
+                <h3>📍 收货信息</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                    <div>
+                        <label style="display:block;font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:5px;">收货人</label>
+                        <input type="text" id="receiver" placeholder="请输入收货人姓名">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:5px;">手机号码</label>
+                        <input type="tel" id="phone" placeholder="请输入手机号码">
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;">
+                    <div>
+                        <label style="display:block;font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:5px;">省份</label>
+                        <select id="province">
+                            <option>广东省</option><option>北京市</option><option>上海市</option><option>浙江省</option><option>江苏省</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:5px;">城市</label>
+                        <select id="city">
+                            <option>佛山市</option><option>广州市</option><option>深圳市</option><option>东莞市</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:5px;">区/县</label>
+                        <select id="district">
+                            <option>南海区</option><option>禅城区</option><option>顺德区</option><option>三水区</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:5px;">详细地址</label>
+                    <textarea id="address" placeholder="街道、门牌号等详细信息"></textarea>
+                </div>
+            </div>
+
+            <div class="checkout-section">
+                <h3>📦 配送方式</h3>
+                <label style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-radius:6px;transition:background 0.15s;font-size:14px;">
+                    <input type="radio" name="delivery" checked> 🚚 快递配送（免运费，预计2-4天送达）
+                </label>
+                <label style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-radius:6px;transition:background 0.15s;font-size:14px;">
+                    <input type="radio" name="delivery"> 🏃 同城速递（免运费，预计当天送达）
+                </label>
+            </div>
+
+            <div class="checkout-section">
+                <h3>💳 支付方式</h3>
+                <label style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-radius:6px;transition:background 0.15s;font-size:14px;">
+                    <input type="radio" name="payment" checked> 💚 微信支付
+                </label>
+                <label style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-radius:6px;transition:background 0.15s;font-size:14px;">
+                    <input type="radio" name="payment"> 💙 支付宝
+                </label>
+                <label style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-radius:6px;transition:background 0.15s;font-size:14px;">
+                    <input type="radio" name="payment"> 🏦 银行卡支付
+                </label>
+            </div>
+
+            <div class="checkout-section">
+                <h3>📝 订单备注</h3>
+                <textarea id="remark" placeholder="如有特殊要求请在此备注（选填）"></textarea>
+            </div>
+        </div>
+
+        <!-- Right: Order Summary -->
+        <div>
+            <div class="order-summary-card">
+                <h3>订单汇总</h3>
+                <div id="orderItems"></div>
+                <div class="order-total">
+                    应付总额：<span id="orderTotal" style="font-size:28px;">¥0.00</span>
+                </div>
+                <button class="btn-submit-order" onclick="submitOrder()">提交订单</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+const cart = getCart();
+let totalPrice = 0;
+
+function renderOrderSummary() {
+    const container = document.getElementById('orderItems');
+    if (cart.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px 0;">购物车为空</p>';
+        return;
+    }
+
+    totalPrice = 0;
+    let html = '';
+    cart.forEach(item => {
+        const product = getProduct(item.id);
+        if (!product) return;
+        const subtotal = product.price * item.quantity;
+        totalPrice += subtotal;
+        html += `
+            <div class="order-item">
+                <span><img src="${product.img}" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;vertical-align:middle;" onerror="this.style.display='none'"> ${product.emoji} ${product.name} ×${item.quantity}</span>
+                <span style="font-weight:600;">${formatPrice(subtotal)}</span>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+    document.getElementById('orderTotal').textContent = formatPrice(totalPrice);
+}
+
+function submitOrder() {
+    const receiver = document.getElementById('receiver').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+
+    if (!receiver) { showToast('请输入收货人姓名'); return; }
+    if (!phone || !/^1[3-9]\d{9}$/.test(phone)) { showToast('请输入正确的手机号码'); return; }
+    if (!address) { showToast('请输入详细地址'); return; }
+    if (cart.length === 0) { showToast('购物车为空'); return; }
+
+    const orderItems = cart.map(item => {
+        const product = getProduct(item.id);
+        return { name: product.name, emoji: product.emoji, img: product.img, price: product.price, quantity: item.quantity };
+    });
+
+    const result = placeOrder({
+        items: orderItems,
+        total: totalPrice,
+        receiver,
+        phone,
+        address: document.getElementById('province').value + document.getElementById('city').value + document.getElementById('district').value + ' ' + address
+    });
+
+    if (result.success) {
+        showToast('订单提交成功！');
+        setTimeout(() => { location.href = 'profile.html'; }, 1000);
+    } else {
+        showToast(result.message);
+    }
+}
+
+renderOrderSummary();
+</script>
+</body>
+</html>
